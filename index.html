@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Random Quote</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+  <link rel="stylesheet" href="./build/font-awesome.min.css"></style>
+  <link href='https://fonts.googleapis.com/css?family=Droid+Serif|Dancing+Script|Great+Vibes' rel='stylesheet' type='text/css'>
+  <style>
+
+body {
+  background-color: #ffcece;
+  transition-property: background-color;
+  transition-duration: 1s;
+  color: black;
+  margin: 0;
+  font-weight: 100;
+  display: flex;
+  align-items: center;
+}
+
+div#quote-div {
+    width: 50%;
+    transition-property: background-color color;
+    transition-duration: 1s;
+    vertical-align: middle;
+    margin-left: 24%;
+    padding: 3%;
+}
+
+html, body {
+    height: 100%;
+}
+
+@media (min-device-width: 320px) 
+  and (max-device-width: 667px) { 
+
+    div#quote-div {
+      width: 80%;
+      margin-left: 8.5%;
+    }
+}
+
+@media (max-device-width: 320px) {
+    html {
+      height: 100%;
+    }
+
+    div#quote-div {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+
+button {
+  border-radius: 4em;
+  cursor: pointer;
+  margin: 1em;
+  border: none;
+  width: 3em;
+  height: 3em;
+  background-color: white;
+  transition-property: background-color border;
+  transition-duration: 200ms;
+}
+
+.fa-angle-right {
+  font-size: 1.5em;
+}
+
+h3 {
+  width: 100%;
+  text-align: right;
+  font-weight:100;
+}
+
+em {
+    margin-right: 2em;
+    text-decoration: none;
+    font-family: 'Droid Serif';
+    opacity: 0.5;
+    font-size: 1.2em;
+    font-weight: 100;
+}
+
+h1.quote {font-family: "Great Vibes";font-weight: 100;font-size: 3em;}
+
+div#quote-div {
+    margin-top: 2em;
+    border-radius: 0.5em;
+}
+
+button:hover {;
+  border: 0.2em solid;
+  opacity: 0.5;
+}
+
+button:active {
+  opacity: 0.2;
+  visibility: 0.5;
+}
+
+.fa-quote-left, .fa-quote-right {
+  font-size: 3em;
+  opacity: 0.5;
+  width: 100%;
+  color: ;
+}
+
+.fa-quote-right {
+  text-align: right;
+}
+
+.slider {
+  width: 100%;
+  height: 100%;
+}
+
+.buttons {
+  display: flex;
+}
+
+  </style>
+</head>
+<body>
+  <div class="slider">
+    <div id="quote-div">
+      <!-- here goes the react content -->
+    </div>
+  </div>
+  <script type="text/babel">
+  var x = 0;
+
+  var bodyColor = [
+    "#ffbe00",
+    "#a7ff00",
+    "tomato",
+    "orange",
+    "yellow",
+    "lightgreen",
+    "#ff5de2",
+    "#00ffd2",
+    "gray"
+  ];
+
+  function changeColor() {
+    var i = (x++) % 9;
+    $("body").css("background-color", bodyColor[i]);
+  }
+
+    // our classes will follow as
+    // main body class that will change color on every change of quote
+    var QuoteBox = React.createClass({
+      render: function() {
+        return (
+          <div className="quoteBox">
+            <h1 className="quote">
+              {this.props.quote}
+            </h1>
+            <i className="fa fa-quote-right">
+            </i>
+            <h3><em>
+              {this.props.author}
+            </em></h3>
+          </div>
+        );
+      }
+    });
+
+    var Button = React.createClass({
+      render: function() {
+        return (
+          <button className={this.props.class} click={this.props.handler} >
+            <i className={ "fa " + this.props.icon }></i>
+          </button>
+        )
+      }
+    })
+
+    var App = React.createClass({
+
+      getQuoteFromServer: function() {
+        var total = 10;
+        $.ajax({
+          url: "https://andruxnet-random-famous-quotes.p.mashape.com/?cat=famous",
+          headers: { 
+            'X-Mashape-Key': "WMS4J7XVpxmshY8miRkzLb9zCvUbp1lDyO4jsnWQWOjhyoDbFG"
+          },
+          success: function(da) {
+            var d = JSON.parse(da);
+            console.log(da);
+            this.setState({data: d, reload: false});
+          }.bind(this),
+
+          error: function() {
+            var e = { 
+              quote: "Oh snap! try changing color by clicking refresh icon",
+              author: ""
+            }
+            this.setState({data: e, reload: true});
+          }.bind(this)
+        });
+      },
+
+      getInitialState: function() {
+        return ({ 
+          data: { quote: "Loading...", author: "Loading..." },
+          reload: false
+        });
+      },
+
+      componentDidMount: function() {
+        this.getQuoteFromServer();
+      },
+
+      handleClick: function() {
+        this.getQuoteFromServer();
+      },
+
+      handleTweet: function() {
+        var tweet_url = "https://twitter.com/share?&text=" + this.state.data.quote + "\n - " + this.state.data.author;
+        window.open(tweet_url);  
+      },
+
+      render: function() {
+        changeColor();
+
+        return (
+          <div className="quote-box">
+            <i className="fa fa-quote-left"></i>
+            <QuoteBox quote={this.state.data.quote} author={this.state.data.author} />
+            <div className="buttons">
+              <button className="change-button" onClick={this.handleClick} >
+                <i className="fa fa-angle-right"></i>
+              </button>
+              <button className="tweet" onClick={this.handleTweet} >
+                <i className="fa fa-twitter"></i>
+              </button>
+              { this.state.reload ? <button className="reload" onClick={this.handleClick} >
+                                      <i className="fa fa-refresh"></i></button>
+                  : "" }
+              
+            </div>
+          </div>
+        );
+      }
+    });
+
+    ReactDOM.render(<App />, document.getElementById('quote-div'));
+  </script>
+</body>
+</html>
